@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
@@ -29,7 +29,7 @@ const Signup = () => {
       Alert.alert('Password must be at least 6 characters.');
       return;
     }
-
+  
     try {
       const response = await axios.post(`${API_BASE_URL}${endpoints.signup}`, {
         username,
@@ -44,7 +44,7 @@ const Signup = () => {
     } catch (error) {
       console.error(error);
       Alert.alert('Signup failed! Please try again.');
-    }
+    } 
   };
 
   return (
@@ -102,8 +102,13 @@ const Signup = () => {
           <TouchableOpacity 
             onPress={handleSignup} 
             style={styles.signupButton}
+            disabled={loading} 
           >
-            <Text style={styles.signupButtonText}>Signup</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color={MyColor.Third} />  
+            ) : (
+              <Text style={styles.signupButtonText}>Signup</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.accountPrompt}>
