@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Image, StyleSheet, SafeAreaView } from 'react-native';
 import { MyColor } from '../utilities/MyColor';
+import LogoutButton from '../Components/LogoutButton';
 
 const Home = () => {
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.centeredView}>
@@ -10,6 +12,7 @@ const Home = () => {
           style={styles.logo}
           source={require('../assets/restaurant.png')}
         />
+        <LogoutButton></LogoutButton>
       </View>
     </SafeAreaView>
   );

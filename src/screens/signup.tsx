@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { MyColor } from '../utilities/MyColor';
-import { API_BASE_URL, endpoints } from './Configuration/Config';
+import { API_BASE_URL, endpoints } from '../Configuration/Config';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../type';
 
 const Signup = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const nav = useNavigation();
+  const nav = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSignup = async () => {
     if (!username || !email || !password) {
@@ -29,6 +30,7 @@ const Signup = () => {
       Alert.alert('Password must be at least 6 characters.');
       return;
     }
+
   
     try {
       const response = await axios.post(`${API_BASE_URL}${endpoints.signup}`, {
@@ -44,7 +46,9 @@ const Signup = () => {
     } catch (error) {
       console.error(error);
       Alert.alert('Signup failed! Please try again.');
-    } 
+    } finally {
+    ; 
+    }
   };
 
   return (
@@ -101,14 +105,8 @@ const Signup = () => {
 
           <TouchableOpacity 
             onPress={handleSignup} 
-            style={styles.signupButton}
-            disabled={loading} 
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={MyColor.Third} />  
-            ) : (
+            style={styles.signupButton} >
               <Text style={styles.signupButtonText}>Signup</Text>
-            )}
           </TouchableOpacity>
 
           <View style={styles.accountPrompt}>

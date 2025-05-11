@@ -1,36 +1,45 @@
-import React, { useState } from 'react';
-import { API_BASE_URL, endpoints } from './Configuration/Config';
-import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ActivityIndicator, StyleSheet } from 'react-native';
+import React, {  useState } from 'react';
+import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { MyColor } from '../utilities/MyColor';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { useauth } from '../context/Authcontext';
+import { NavigationProp } from '@react-navigation/core'
+import { RootStackParamList } from '../type';
+
 
 const Login = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // To manage loading state
-  const nav = useNavigation();
+  
+  const { onLogin } = useauth()
+  const nav = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Validation Error', 'Please enter both email and password.');
       return;
     }
-    setLoading(true); // Show loading indicator while API request is in progress
+
     try {
-      const response = await axios.post(`${API_BASE_URL}${endpoints.login}`,{ email, password });
-      setLoading(false); // Stop loading after response
-      if (response.status === 200) {
-        console.log(response.data);
+      if (!onLogin) {
+        Alert.alert('Login Failed', 'Authentication function is missing.');
+        return;}
+
+      const result = await onLogin(email, password);  
+
+      if (result && !result.error) {
         Alert.alert('Login Successful', 'Welcome back!');
-        nav.navigate('Home'); 
+        setTimeout(() => {
+          nav.navigate('Home');
+        }, 100);
+
       } else {
         Alert.alert('Login Failed', 'Invalid credentials');
       }
     } catch (error) {
-      setLoading(false);
       console.error(error);
       if (axios.isAxiosError(error) && error.response) {
         Alert.alert('Login Failed', error.response.data.message || 'Invalid credentials');
@@ -82,16 +91,10 @@ const Login = () => {
 
             <TouchableOpacity
               onPress={handleLogin}
-              disabled={loading}
-              style={[styles.loginButton, { opacity: loading ? 0.6 : 1 }]}
+              style={styles.loginButton}
             >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text style={styles.loginButtonText}>Login</Text>
-              )}
+              <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
-
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an Account?</Text>
               <TouchableOpacity onPress={() => nav.navigate('Signup')}>
@@ -108,7 +111,7 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: MyColor.secondary || '#fff', // Default to white if not set
+    backgroundColor: MyColor.secondary || '#fff',
   },
   scrollView: {
     flex: 1,
@@ -129,7 +132,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   subtitle: {
-    color: MyColor.fifth || '#808080', 
+    color: MyColor.fifth || '#808080',
     fontSize: 16,
     fontWeight: '400',
     marginTop: 10,
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   input: {
-    borderColor: MyColor.fifth || '#808080', 
+    borderColor: MyColor.fifth || '#808080',
     borderBottomWidth: 2,
     borderRadius: 10,
     fontSize: 16,
@@ -149,7 +152,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   passwordContainer: {
-    borderColor: MyColor.fifth || '#808080', 
+    borderColor: MyColor.fifth || '#808080',
     borderBottomWidth: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -166,7 +169,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   loginButtonText: {
-    alignSelf: 'center',
     fontSize: 18,
     color: MyColor.Third || '#fff',
   },
@@ -186,3 +188,5 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
+
+
