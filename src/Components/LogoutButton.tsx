@@ -1,12 +1,12 @@
 import React from 'react';
 import { TouchableOpacity, Text, Alert, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useauth } from '../context/Authcontext';
+import { useAuth } from '../context/Authcontext';
 import { NavigationProp } from '@react-navigation/core'
 import { RootStackParamList } from '../type';
 const LogoutButton = () => {
   const nav = useNavigation<NavigationProp<RootStackParamList>>();
-  const { onLogout } = useauth();
+  const { onLogout } = useAuth();
 
   const handleLogout = () => {
     Alert.alert('Confirm Logout', 'Are you sure you want to logout?', [
@@ -15,9 +15,10 @@ const LogoutButton = () => {
         text: 'Logout',
         onPress: async () => {
           if (onLogout) {
-            await onLogout();           
+            await onLogout(); 
+            nav.navigate('Login');            
           }
-          nav.navigate('Login');       
+             
         },
       },
     ]);

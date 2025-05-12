@@ -6,6 +6,8 @@ const config = {
       endpoints: {
         login: '/auth/login',
         signup: '/auth/signup',
+        logout: '/auth/logout', 
+        refresh: '/auth/refresh',
        
       },
       screens: {
@@ -21,6 +23,8 @@ const config = {
       endpoints: {
         login: '/auth/login',
         signup: '/auth/signup',
+        logout: '/auth/logout', 
+        refresh: '/auth/refresh',
         
       },
       screens: {
@@ -36,6 +40,8 @@ const config = {
       endpoints: {
         login: '/auth/login',
         signup: '/auth/signup',
+        logout: '/auth/logout', 
+        refresh: '/auth/refresh',
        
       },
       screens: {

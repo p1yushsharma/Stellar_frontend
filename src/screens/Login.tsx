@@ -4,7 +4,7 @@ import { MyColor } from '../utilities/MyColor';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { useauth } from '../context/Authcontext';
+import { useAuth } from '../context/Authcontext';
 import { NavigationProp } from '@react-navigation/core'
 import { RootStackParamList } from '../type';
 
@@ -14,7 +14,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  const { onLogin } = useauth()
+  const { onLogin } = useAuth()
   const nav = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleLogin = async () => {
@@ -32,13 +32,8 @@ const Login = () => {
 
       if (result && !result.error) {
         Alert.alert('Login Successful', 'Welcome back!');
-        setTimeout(() => {
-          nav.navigate('Home');
-        }, 100);
-
-      } else {
-        Alert.alert('Login Failed', 'Invalid credentials');
-      }
+       nav.navigate('Home');
+       } 
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error) && error.response) {

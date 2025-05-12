@@ -1,22 +1,10 @@
-import React, { useEffect } from 'react';
+
 import { View, Text, StatusBar, Image, Animated, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../type';
 import { MyColor } from '../utilities/MyColor';
 
-type SplashNavigationProp = StackNavigationProp<RootStackParamList, 'Splash'>;
 
 const Splash = () => {
-  const navigation = useNavigation<SplashNavigationProp>();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Signup');
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [navigation]);
+ 
 
   return (
     <View style={styles.container}>

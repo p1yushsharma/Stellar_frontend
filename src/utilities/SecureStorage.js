@@ -1,34 +1,34 @@
 import * as Keychain from 'react-native-keychain';
 
-// Save token
-export const saveToken = async token => {
+export const saveTokens = async (accessToken, refreshToken) => {
   try {
-    await Keychain.setGenericPassword('authToken', token);
+    const tokens = JSON.stringify({accessToken, refreshToken});
+    await Keychain.setGenericPassword('tokens', tokens);
   } catch (error) {
-    console.error('Error saving token:', error);
+    console.error('Error saving tokens:', error);
   }
 };
 
-// Get token
-export const getToken = async () => {
+export const getTokens = async () => {
   try {
-    const credentials = await Keychain.getGenericPassword();
+    const credentials = await Keychain.getGenericPassword('tokens');
     if (credentials) {
-      return credentials.password;
+      const {accessToken, refreshToken} = JSON.parse(credentials.password);
+      return {accessToken, refreshToken};
     } else {
-      console.log('No token stored');
+      console.log('No tokens stored');
       return null;
     }
   } catch (error) {
-    console.error('Error retrieving token:', error);
+    console.error('Error retrieving tokens:', error);
     return null;
   }
 };
 
-export const deleteToken = async () => {
+export const deleteTokens = async () => {
   try {
-    await Keychain.resetGenericPassword();
+    await Keychain.resetGenericPassword('tokens');
   } catch (error) {
-    console.error('Error deleting token:', error);
+    console.error('Error deleting tokens:', error);
   }
 };
