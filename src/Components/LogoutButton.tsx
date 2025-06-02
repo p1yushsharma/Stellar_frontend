@@ -1,10 +1,15 @@
 import React from 'react';
-import { TouchableOpacity, Text, Alert, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, Alert, StyleSheet, ViewStyle, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/Authcontext';
 import { NavigationProp } from '@react-navigation/core'
-import { RootStackParamList } from '../type';
-const LogoutButton = () => {
+import { RootStackParamList } from '../utilities/type';
+import { MyColor } from '../utilities/MyColor';
+interface LogoutButtonProps {
+  style?: ViewStyle;
+}
+
+const LogoutButton: React.FC<LogoutButtonProps> = ({ style }) => {
   const nav = useNavigation<NavigationProp<RootStackParamList>>();
   const { onLogout } = useAuth();
 
@@ -26,23 +31,28 @@ const LogoutButton = () => {
 
   return (
     <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-      <Text style={styles.logoutButtonText}>Logout</Text>
+     <Image
+            source={require('../assets/logout.png')} 
+            style={styles.icon}
+          />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   logoutButton: {
-    backgroundColor: '#FF6347',
-    padding: 15,
-    borderRadius: 25,
+    backgroundColor: '#e8e8e8',
+    padding: 4,
+  
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 18,
+   icon: {
+    width: 40,
+    height: 40,
+    
   },
+
 });
 
 export default LogoutButton;

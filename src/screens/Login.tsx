@@ -1,12 +1,12 @@
 import React, {  useState } from 'react';
 import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { MyColor } from '../utilities/MyColor';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useAuth } from '../context/Authcontext';
 import { NavigationProp } from '@react-navigation/core'
-import { RootStackParamList } from '../type';
+import { RootStackParamList } from '../utilities/type';
 
 
 const Login = () => {
@@ -76,9 +76,9 @@ const Login = () => {
                 onChangeText={setPassword}
                 style={styles.input}
               />
-              <Ionicons
+              <Icon
                 onPress={() => setIsVisible(!isVisible)}
-                name={isVisible ? 'eye' : 'eye-off'}
+                name={isVisible ? 'eye' : 'eye-with-line'}
                 size={24}
                 color="black"
               />

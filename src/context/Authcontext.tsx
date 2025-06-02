@@ -1,25 +1,35 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axiosInstance from "../AxiosInstance";
-import { API_BASE_URL, endpoints } from "../Configuration/Config";
+import { authInstance, cartInstance, productInstance, setupInterceptors } from "../utilities/AxiosInstance";
+import { endpoints } from "../Configuration/Config";
 import { deleteTokens, getTokens, saveTokens } from "../utilities/SecureStorage";
-import { setupInterceptors } from "../AxiosInstance";
-import axios from "axios";
 
 interface AuthProps {
-    authState?: {
-      accessToken: string | null;
-      refreshToken: string | null;
-      authenticated: boolean | null;
-    };
-    onSignup?: (email: string, password: string) => Promise<any>;
-    onLogin?: (email: string, password: string) => Promise<any>;
-    onLogout?: () => Promise<any>;
+  authState?: {
+    accessToken: string | null;
+    refreshToken: string | null;
+    authenticated: boolean | null;
+  };
+  onSignup?: (email: string, password: string) => Promise<any>;
+  onLogin?: (email: string, password: string) => Promise<any>;
+  onLogout?: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthProps>({});
 
-export const useAuth = () => {
-  return useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);
+
+const allInstances = [authInstance, productInstance,cartInstance];
+
+const setAuthorizationHeaders = (accessToken: string) => {
+  allInstances.forEach(instance => {
+    instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+  });
+};
+
+const removeAuthorizationHeaders = () => {
+  allInstances.forEach(instance => {
+    delete instance.defaults.headers.common["Authorization"];
+  });
 };
 
 export const AuthProvider = ({ children }: any) => {
@@ -34,41 +44,43 @@ export const AuthProvider = ({ children }: any) => {
   });
 
   useEffect(() => {
-    const checkTokens = async () => {
+    const initTokens = async () => {
       const tokens = await getTokens();
-      if (tokens && tokens.accessToken && tokens.refreshToken) {
+      if (tokens?.accessToken && tokens?.refreshToken) {
         setAuthState({
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            authenticated: true,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          authenticated: true,
         });
-        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${tokens.accessToken}`;
+        setAuthorizationHeaders(tokens.accessToken);
       } else {
         setAuthState({
-            accessToken: null,
-            refreshToken: null,
-            authenticated: false,
+          accessToken: null,
+          refreshToken: null,
+          authenticated: false,
         });
       }
     };
-    checkTokens();
+    initTokens();
   }, []);
-  
+
   useEffect(() => {
-    setupInterceptors(Refresh, Logout);
+    setupInterceptors(authInstance, Refresh, Logout);
+    setupInterceptors(productInstance, Refresh, Logout);
+    setupInterceptors(cartInstance, Refresh, Logout);
   }, []);
 
   const Signup = async (email: string, password: string) => {
     try {
-      return await axiosInstance.post(`${API_BASE_URL}${endpoints.signup}`, { email, password });
-    } catch (e) {
-      return { error: true, msg: (e as any).response.data.msg };
+      return await authInstance.post(endpoints.auth.signup, { email, password });
+    } catch (e: any) {
+      return { error: true, msg: e.response?.data?.msg || "Signup failed" };
     }
   };
 
   const Login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}${endpoints.login}`, { email, password });
+      const response = await authInstance.post(endpoints.auth.login, { email, password });
       const { accessToken, refreshToken } = response.data;
 
       setAuthState({
@@ -77,28 +89,31 @@ export const AuthProvider = ({ children }: any) => {
         authenticated: true,
       });
 
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      await saveTokens(accessToken, refreshToken); 
+      setAuthorizationHeaders(accessToken);
+      await saveTokens(accessToken, refreshToken);
 
-      return;
-    } catch (e) {
-      return { error: true, msg: (e as any).response.data.msg };
+      return { success: true };
+    } catch (e: any) {
+      return { error: true, msg: e.response?.data?.msg || "Login failed" };
     }
   };
 
   const Logout = async () => {
-    if (authState.refreshToken) {
-      const response = await axiosInstance.post(`${API_BASE_URL}${endpoints.logout}`, {
-        token: authState.refreshToken,
-      });
-    }
-    await deleteTokens(); 
-    axiosInstance.defaults.headers.common["Authorization"] = "";
-    setAuthState({
+    try {
+      if (authState.refreshToken) {
+        await authInstance.post(endpoints.auth.logout, { token: authState.refreshToken });
+      }
+    } catch {
+      // ignore logout errors
+    } finally {
+      await deleteTokens();
+      removeAuthorizationHeaders();
+      setAuthState({
         accessToken: null,
         refreshToken: null,
         authenticated: false,
-    });
+      });
+    }
   };
 
   const Refresh = async () => {
@@ -108,23 +123,22 @@ export const AuthProvider = ({ children }: any) => {
 
       if (!refreshToken) throw new Error("No refresh token");
 
-      const response = await axiosInstance.post(`${API_BASE_URL}${endpoints.refresh}`, {
-        refreshToken,
-      });
+      const response = await authInstance.post(endpoints.auth.refresh, { refreshToken });
 
       const { accessToken } = response.data;
 
-      setAuthState({
+      setAuthState((prev) => ({
+        ...prev,
         accessToken,
-        refreshToken,
         authenticated: true,
-      });
+      }));
 
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      await saveTokens(accessToken, refreshToken);  
+      setAuthorizationHeaders(accessToken);
+      await saveTokens(accessToken, refreshToken);
+
       return { success: true };
-    } catch (e) {
-      await deleteTokens();  
+    } catch {
+      await deleteTokens();
       setAuthState({
         accessToken: null,
         refreshToken: null,
@@ -135,11 +149,10 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const value = {
+    authState,
     onSignup: Signup,
     onLogin: Login,
     onLogout: Logout,
-    onRefresh: Refresh,
-    authState,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

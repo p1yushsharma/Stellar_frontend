@@ -3,9 +3,10 @@ import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, Touc
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import { MyColor } from '../utilities/MyColor';
-import { API_BASE_URL, endpoints } from '../Configuration/Config';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../type';
+import { RootStackParamList } from '../utilities/type';
+import { on } from 'events';
+import { useAuth } from '../context/Authcontext';
 
 const Signup = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -13,8 +14,13 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const nav = useNavigation<NavigationProp<RootStackParamList>>();
-
+  const { onSignup } = useAuth();
   const handleSignup = async () => {
+    if (!onSignup) {
+      Alert.alert('Authentication service not available');
+      return;
+    }
+    
     if (!username || !email || !password) {
       Alert.alert('All fields are required.');
       return;
@@ -33,11 +39,8 @@ const Signup = () => {
 
   
     try {
-      const response = await axios.post(`${API_BASE_URL}${endpoints.signup}`, {
-        username,
-        email,
-        password,
-      });
+      const response = await onSignup(email, password);  
+      
 
       if (response.status === 200) {
         Alert.alert('Signup successful!');

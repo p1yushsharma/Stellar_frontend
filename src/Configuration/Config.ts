@@ -1,63 +1,32 @@
 
+export const ENV = 'development';
 
-const config = {
-    development: {
-      API_BASE_URL: 'http://10.0.2.2:8080/api',  
-      endpoints: {
-        login: '/auth/login',
-        signup: '/auth/signup',
-        logout: '/auth/logout', 
-        refresh: '/auth/refresh',
-       
-      },
-      screens: {
-        splash: 'Splash',  
-        login: 'Login',
-        signup: 'Signup',
-        home: 'Home',
-      
-      },
-    },
-    production: {
-      API_BASE_URL: 'https://your-production-api-url.com/api',  
-      endpoints: {
-        login: '/auth/login',
-        signup: '/auth/signup',
-        logout: '/auth/logout', 
-        refresh: '/auth/refresh',
-        
-      },
-      screens: {
-        splash: 'Splash',
-        login: 'Login',
-        signup: 'Signup',
-        home: 'Home',
-      
-      },
-    },
-    staging: {
-      API_BASE_URL: 'https://staging-api-url.com/api',  
-      endpoints: {
-        login: '/auth/login',
-        signup: '/auth/signup',
-        logout: '/auth/logout', 
-        refresh: '/auth/refresh',
-       
-      },
-      screens: {
-        splash: 'Splash',
-        login: 'Login',
-        signup: 'Signup',
-        home: 'Home',
-      
-      },
-    },
-  };
-  
+export const baseUrls = {
+  development: {
+    auth: 'http://10.0.2.2:8080/api',
+    product: 'http://10.0.2.2:8082/api',
+    cart: 'http://10.0.2.2:8083/api',
+  },
 
-  const currentEnv = (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'staging';
-  
-  export const API_BASE_URL = config[currentEnv].API_BASE_URL;
-  export const endpoints = config[currentEnv].endpoints;
-  export const screens = config[currentEnv].screens;
-  
+};
+
+export const endpoints = {
+  auth: {
+    signup: '/auth/signup',
+    login: '/auth/login',
+    logout: '/auth/logout',
+    refresh: '/auth/refresh',
+  },
+  product: {
+    getAll: '/menu-items/get-all',
+    getById: (id: number) => `/menu-items/get/${id}`,
+  },
+ cart: {
+  add: '/cart/add',
+  remove: (productId: number) => `/cart/remove/${productId}`,
+  clear: '/cart/clear', 
+  get: '/cart/get',
+  update: '/cart/update'
+}
+
+};
