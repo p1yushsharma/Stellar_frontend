@@ -2,9 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
-  ImageSourcePropType,
   ViewStyle,
   StyleProp,
 } from 'react-native';
@@ -44,6 +42,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     justifyContent: 'space-between',
     elevation: 4,
+    zIndex: 1000,
   },
   sideContainer: {
      width: 60,

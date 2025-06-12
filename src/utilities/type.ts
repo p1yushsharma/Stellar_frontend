@@ -5,6 +5,9 @@ export type RootStackParamList = {
     Home: undefined;
     Cart: undefined;
     ProductDetail: undefined;
+    Checkout: undefined;
+    UserProfile:undefined;
+    OrderHistory: undefined;
 };
    
 export type Product = {

@@ -8,11 +8,11 @@ import { CartProvider } from './src/context/Cartcontext';
 const App = () => {
   return (
     <AuthProvider>
+     <ProductProvider>
       <CartProvider>
-      <ProductProvider>
         <AppNAV />
-      </ProductProvider>
       </CartProvider>
+      </ProductProvider>
     </AuthProvider> 
   );
 };

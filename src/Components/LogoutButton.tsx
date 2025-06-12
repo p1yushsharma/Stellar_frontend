@@ -5,6 +5,7 @@ import { useAuth } from '../context/Authcontext';
 import { NavigationProp } from '@react-navigation/core'
 import { RootStackParamList } from '../utilities/type';
 import { MyColor } from '../utilities/MyColor';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 interface LogoutButtonProps {
   style?: ViewStyle;
 }
@@ -31,10 +32,10 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ style }) => {
 
   return (
     <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-     <Image
-            source={require('../assets/logout.png')} 
-            style={styles.icon}
-          />
+    <Icon name="logout"
+          size={30} 
+          color={MyColor.Fourth} 
+    />
     </TouchableOpacity>
   );
 };

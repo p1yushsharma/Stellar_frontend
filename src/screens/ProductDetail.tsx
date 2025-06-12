@@ -1,14 +1,11 @@
 import React from 'react';
 import { View, Image, StyleSheet, SafeAreaView, StatusBar, FlatList, TouchableOpacity } from 'react-native';
 import { MyColor } from '../utilities/MyColor';
-import LogoutButton from '../Components/LogoutButton';
-import HomeIcon from '../Components/ScreenWrapper';
 import NavBar from '../Components/NavBar';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../utilities/type';
 import ProductCard from '../Components/ProductCard';
 import { useProduct } from '../context/ProductContext';
-import { Screen } from 'react-native-screens';
 import ScreenWrapper from '../Components/ScreenWrapper';
 import HomeButton from '../Components/HomeButton';
 
@@ -32,12 +29,12 @@ const ProductDetail = () => {
         />
       </View>
       <View style={styles.listContainer}>
-        <FlatList
+        <FlatList 
           data={products}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <ProductCard product={item} />}
         />
-      </View>
+      </View> 
     </SafeAreaView>
     </ScreenWrapper>
   );

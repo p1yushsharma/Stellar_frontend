@@ -13,6 +13,9 @@ export const productInstance = axios.create({
 export const cartInstance = axios.create({
   baseURL: baseUrls[ENV].cart,
 });
+export const orderInstance = axios.create({
+  baseURL: baseUrls[ENV].order,
+});
 
 
 export const setupInterceptors = (

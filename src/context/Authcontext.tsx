@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { authInstance, cartInstance, productInstance, setupInterceptors } from "../utilities/AxiosInstance";
+import { authInstance, cartInstance, orderInstance, productInstance, setupInterceptors } from "../utilities/AxiosInstance";
 import { endpoints } from "../Configuration/Config";
 import { deleteTokens, getTokens, saveTokens } from "../utilities/SecureStorage";
 
@@ -8,6 +8,11 @@ interface AuthProps {
     accessToken: string | null;
     refreshToken: string | null;
     authenticated: boolean | null;
+    userInfo: {
+      id: string;
+      email: string;
+      name: string;
+    } | null;
   };
   onSignup?: (email: string, password: string) => Promise<any>;
   onLogin?: (email: string, password: string) => Promise<any>;
@@ -18,7 +23,7 @@ const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => useContext(AuthContext);
 
-const allInstances = [authInstance, productInstance,cartInstance];
+const allInstances = [authInstance, productInstance, cartInstance,orderInstance];
 
 const setAuthorizationHeaders = (accessToken: string) => {
   allInstances.forEach(instance => {
@@ -37,27 +42,36 @@ export const AuthProvider = ({ children }: any) => {
     accessToken: string | null;
     refreshToken: string | null;
     authenticated: boolean | null;
+    userInfo: {
+      id: string;
+      email: string;
+      name: string;
+    } | null;
   }>({
     accessToken: null,
     refreshToken: null,
     authenticated: null,
+    userInfo: null,
   });
 
   useEffect(() => {
     const initTokens = async () => {
       const tokens = await getTokens();
       if (tokens?.accessToken && tokens?.refreshToken) {
+        setAuthorizationHeaders(tokens.accessToken);
+        const userInfo = await fetchUserInfo();
         setAuthState({
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
           authenticated: true,
+          userInfo,
         });
-        setAuthorizationHeaders(tokens.accessToken);
       } else {
         setAuthState({
           accessToken: null,
           refreshToken: null,
           authenticated: false,
+          userInfo: null,
         });
       }
     };
@@ -68,7 +82,17 @@ export const AuthProvider = ({ children }: any) => {
     setupInterceptors(authInstance, Refresh, Logout);
     setupInterceptors(productInstance, Refresh, Logout);
     setupInterceptors(cartInstance, Refresh, Logout);
+    setupInterceptors(orderInstance, Refresh, Logout);
   }, []);
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await authInstance.get(endpoints.auth.userInfo);
+      return response.data;
+    } catch (e) {
+      return null;
+    }
+  };
 
   const Signup = async (email: string, password: string) => {
     try {
@@ -83,14 +107,17 @@ export const AuthProvider = ({ children }: any) => {
       const response = await authInstance.post(endpoints.auth.login, { email, password });
       const { accessToken, refreshToken } = response.data;
 
+      setAuthorizationHeaders(accessToken);
+      await saveTokens(accessToken, refreshToken);
+
+      const userInfo = await fetchUserInfo();
+
       setAuthState({
         accessToken,
         refreshToken,
         authenticated: true,
+        userInfo,
       });
-
-      setAuthorizationHeaders(accessToken);
-      await saveTokens(accessToken, refreshToken);
 
       return { success: true };
     } catch (e: any) {
@@ -104,7 +131,7 @@ export const AuthProvider = ({ children }: any) => {
         await authInstance.post(endpoints.auth.logout, { token: authState.refreshToken });
       }
     } catch {
-      // ignore logout errors
+     
     } finally {
       await deleteTokens();
       removeAuthorizationHeaders();
@@ -112,6 +139,7 @@ export const AuthProvider = ({ children }: any) => {
         accessToken: null,
         refreshToken: null,
         authenticated: false,
+        userInfo: null,
       });
     }
   };
@@ -124,17 +152,19 @@ export const AuthProvider = ({ children }: any) => {
       if (!refreshToken) throw new Error("No refresh token");
 
       const response = await authInstance.post(endpoints.auth.refresh, { refreshToken });
-
       const { accessToken } = response.data;
+
+      setAuthorizationHeaders(accessToken);
+      await saveTokens(accessToken, refreshToken);
+
+      const userInfo = await fetchUserInfo();
 
       setAuthState((prev) => ({
         ...prev,
         accessToken,
         authenticated: true,
+        userInfo,
       }));
-
-      setAuthorizationHeaders(accessToken);
-      await saveTokens(accessToken, refreshToken);
 
       return { success: true };
     } catch {
@@ -143,6 +173,7 @@ export const AuthProvider = ({ children }: any) => {
         accessToken: null,
         refreshToken: null,
         authenticated: false,
+        userInfo: null,
       });
       return { error: true, msg: "Session expired" };
     }

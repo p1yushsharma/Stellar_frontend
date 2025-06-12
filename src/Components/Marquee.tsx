@@ -53,7 +53,7 @@ const Marquee: React.FC<MarqueeProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%', // fill parent width
+    width: '100%', 
     height: 40,
     overflow: 'hidden',
     justifyContent: 'center',

@@ -4,11 +4,14 @@ import Login from '../screens/Login';
 import Signup from '../screens/signup';
 import Home from '../screens/Home';
 import Cart from '../screens/Cart';
+import Checkout from '../screens/Checkout';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utilities/type';
 import { useAuth } from '../context/Authcontext';
 import ProductDetail from '../screens/ProductDetail';
+import UserProfile from '../screens/UserProfile';
+import OrderHistory from '../screens/OrderHistory';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -36,7 +39,12 @@ const AppNAV = () => {
         {authState?.authenticated ? (
           <><Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="ProductDetail" component={ProductDetail} />
-          <Stack.Screen name="Cart" component={Cart} /></>
+          <Stack.Screen name="Cart" component={Cart} />
+          <Stack.Screen name="Checkout" component={Checkout} />
+          <Stack.Screen name="UserProfile" component={UserProfile}/>
+          <Stack.Screen name="OrderHistory" component={OrderHistory} />
+          </>
+          
         ) : (
           <>
             <Stack.Screen name="Login" component={Login} />

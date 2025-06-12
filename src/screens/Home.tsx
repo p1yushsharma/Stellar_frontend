@@ -10,7 +10,6 @@ import {
   Text,
   Pressable,
   Animated,
-  ImageBackground,
 } from 'react-native';
 import { MyColor } from '../utilities/MyColor';
 import LogoutButton from '../Components/LogoutButton';
@@ -21,7 +20,7 @@ import { useProduct } from '../context/ProductContext';
 import { useScaleAnimation } from '../utilities/Animation';
 import ScreenWrapper from '../Components/ScreenWrapper';
 import Marquee from '../Components/Marquee';
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
 interface Product {
   id: number;
   name: string;
@@ -59,13 +58,21 @@ const Home = () => {
         <View style={styles.navbar}>
           <NavBar
             title="Home"
-            leftComponent={<LogoutButton style={{ marginRight: 10 }} />}
+            leftComponent={
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => nav.navigate('UserProfile')}>
+          <Icon name="account-circle" size={30} color="#fff" style={{ marginRight: 12 }} />
+          </TouchableOpacity>
+          <LogoutButton />
+          </View>
+      }
             rightComponent={
               <TouchableOpacity onPress={() => nav.navigate('Cart')}>
-                <Image
-                  source={require('../assets/cart.png')}
-                  style={{ width: 50, height: 50, marginRight: 10 }}
-                />
+               <Icon
+                name="shopping-cart"
+                size={45}
+                color={MyColor.Fourth}
+              />
               </TouchableOpacity>
             }
           />

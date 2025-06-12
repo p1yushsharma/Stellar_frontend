@@ -1,7 +1,7 @@
 import React, {  useState } from 'react';
 import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { MyColor } from '../utilities/MyColor';
-import Icon from "react-native-vector-icons/Ionicons";
+import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useAuth } from '../context/Authcontext';
@@ -76,7 +76,7 @@ const Login = () => {
                 onChangeText={setPassword}
                 style={styles.input}
               />
-              <Icon
+              <Entypo
                 onPress={() => setIsVisible(!isVisible)}
                 name={isVisible ? 'eye' : 'eye-with-line'}
                 size={24}
