@@ -45,7 +45,7 @@ const Checkout = () => {
 
   const tax = +(subtotal * 0.1).toFixed(2);
   const delivery = subtotal > 0 ? 40 : 0;
-  const totalAmount = subtotal + tax + delivery;
+  const totalAmount = +(subtotal + tax + delivery).toFixed(2); 
 
   const handlePlaceOrder = async () => {
     try {

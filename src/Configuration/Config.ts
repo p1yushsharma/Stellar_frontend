@@ -1,13 +1,13 @@
-import { userInfo } from "os";
+
 
 export const ENV = 'development';
 
 export const baseUrls = {
   development: {
-    auth: 'http://10.0.2.2:8080/api',
-    product: 'http://10.0.2.2:8082/api',
-    cart: 'http://10.0.2.2:8083/api',
-    order: 'http://10.0.2.2:8084/api'
+    auth: 'https://stellar-463207.uc.r.appspot.com/api',
+    product: 'https://product-service-dot-stellar-463207.uc.r.appspot.com/api',
+    cart: 'http://cart-service-dot-stellar-463207.uc.r.appspot.com/api',
+    order: 'http://order-service-dot-stellar-463207.uc.r.appspot.com/api',
   },
 
 };

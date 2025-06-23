@@ -11,8 +11,7 @@ import {
   Pressable,
   Animated,
 } from 'react-native';
-import { MyColor } from '../utilities/MyColor';
-import LogoutButton from '../Components/LogoutButton';
+import { MyColor } from '../utilities/MyColor'
 import NavBar from '../Components/NavBar';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../utilities/type';
@@ -59,13 +58,10 @@ const Home = () => {
           <NavBar
             title="Home"
             leftComponent={
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => nav.navigate('UserProfile')}>
-          <Icon name="account-circle" size={30} color="#fff" style={{ marginRight: 12 }} />
+          <Icon name="account-circle" size={40} color="#fff" style={{ marginRight: 12 }} />
           </TouchableOpacity>
-          <LogoutButton />
-          </View>
-      }
+             }
             rightComponent={
               <TouchableOpacity onPress={() => nav.navigate('Cart')}>
                <Icon
