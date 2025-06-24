@@ -1,20 +1,33 @@
-import React, {  useState } from 'react';
-import { SafeAreaView, StatusBar, ScrollView, Image, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  Image,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import { MyColor } from '../utilities/MyColor';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useAuth } from '../context/Authcontext';
-import { NavigationProp } from '@react-navigation/core'
+import { NavigationProp } from '@react-navigation/core';
 import { RootStackParamList } from '../utilities/type';
-
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const Login = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  const { onLogin } = useAuth()
+
+  const { onLogin, onGoogleLogin } = useAuth();
   const nav = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleLogin = async () => {
@@ -26,14 +39,15 @@ const Login = () => {
     try {
       if (!onLogin) {
         Alert.alert('Login Failed', 'Authentication function is missing.');
-        return;}
+        return;
+      }
 
-      const result = await onLogin(email, password);  
+      const result = await onLogin(email, password);
 
       if (result && !result.error) {
         Alert.alert('Login Successful', 'Welcome back!');
-       nav.navigate('Home');
-       } 
+        nav.navigate('Home');
+      }
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error) && error.response) {
@@ -41,6 +55,27 @@ const Login = () => {
       } else {
         Alert.alert('Login Failed', 'An error occurred. Please try again later.');
       }
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      if (!onGoogleLogin) {
+        Alert.alert('Login Failed', 'Google login function not available.');
+        return;
+      }
+
+      const result = await onGoogleLogin();
+
+      if (result && !result.error) {
+        Alert.alert('Login Successful', 'Welcome via Google!');
+        nav.navigate('Home');
+      } else {
+        Alert.alert('Login Failed', result.msg || 'Google login failed');
+      }
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Login Failed', 'Google sign-in error');
     }
   };
 
@@ -84,12 +119,15 @@ const Login = () => {
               />
             </View>
 
-            <TouchableOpacity
-              onPress={handleLogin}
-              style={styles.loginButton}
-            >
+            <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
               <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
+
+            {/* Google Login Button */}
+            <TouchableOpacity onPress={handleGoogleLogin} style={styles.googleButton}>
+              <Text style={styles.googleButtonText}>Sign in with Google</Text>
+            </TouchableOpacity>
+
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an Account?</Text>
               <TouchableOpacity onPress={() => nav.navigate('Signup')}>
@@ -167,6 +205,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: MyColor.Third || '#fff',
   },
+  googleButton: {
+    backgroundColor: '#db4437',
+    marginTop: 15,
+    height: 60,
+    width: '63%',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  googleButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+  },
   signupContainer: {
     flexDirection: 'row',
     marginTop: 20,
@@ -179,9 +232,8 @@ const styles = StyleSheet.create({
   signupLink: {
     fontSize: 16,
     color: MyColor.primary || '#007BFF',
+    marginLeft: 5,
   },
 });
 
 export default Login;
-
-

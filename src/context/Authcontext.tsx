@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { authInstance, cartInstance, orderInstance, productInstance, setupInterceptors } from "../utilities/AxiosInstance";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import {
+  authInstance,
+  cartInstance,
+  orderInstance,
+  productInstance,
+  setupInterceptors,
+} from "../utilities/AxiosInstance";
 import { endpoints } from "../Configuration/Config";
 import { deleteTokens, getTokens, saveTokens } from "../utilities/SecureStorage";
 
@@ -17,13 +24,14 @@ interface AuthProps {
   onSignup?: (email: string, password: string) => Promise<any>;
   onLogin?: (email: string, password: string) => Promise<any>;
   onLogout?: () => Promise<any>;
+  onGoogleLogin?: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => useContext(AuthContext);
 
-const allInstances = [authInstance, productInstance, cartInstance,orderInstance];
+const allInstances = [authInstance, productInstance, cartInstance, orderInstance];
 
 const setAuthorizationHeaders = (accessToken: string) => {
   allInstances.forEach(instance => {
@@ -125,13 +133,47 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+  const GoogleLogin = async () => {
+  try {
+    await GoogleSignin.hasPlayServices();
+    await GoogleSignin.signIn(); 
+    const { idToken } = await GoogleSignin.getTokens();
+
+    if (!idToken) throw new Error("No ID token returned");
+
+
+    const response = await authInstance.post(endpoints.auth.oauthLogin, {
+      provider: "google",
+      token: idToken,
+    });
+
+    const { accessToken, refreshToken } = response.data;
+
+    setAuthorizationHeaders(accessToken);
+    await saveTokens(accessToken, refreshToken);
+
+    const userInfo = await fetchUserInfo();
+
+    setAuthState({
+      accessToken,
+      refreshToken,
+      authenticated: true,
+      userInfo,
+    });
+
+    return { success: true };
+  } catch (e: any) {
+    return { error: true, msg: e.message || "Google login failed" };
+  }
+};
+
+
   const Logout = async () => {
     try {
       if (authState.refreshToken) {
         await authInstance.post(endpoints.auth.logout, { token: authState.refreshToken });
       }
     } catch {
-     
     } finally {
       await deleteTokens();
       removeAuthorizationHeaders();
@@ -184,6 +226,7 @@ export const AuthProvider = ({ children }: any) => {
     onSignup: Signup,
     onLogin: Login,
     onLogout: Logout,
+    onGoogleLogin: GoogleLogin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
