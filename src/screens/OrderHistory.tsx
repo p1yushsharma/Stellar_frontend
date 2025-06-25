@@ -12,8 +12,6 @@ import { useProduct } from '../context/ProductContext';
 import { useAuth } from '../context/Authcontext';
 import ScreenWrapper from '../Components/ScreenWrapper';
 import NavBar from '../Components/NavBar';
-import HomeButton from '../Components/HomeButton';
-import LogoutButton from '../Components/LogoutButton';
 import { endpoints } from '../Configuration/Config';
 import { MyColor } from '../utilities/MyColor';
 import BackButton from '../Components/BackButton';

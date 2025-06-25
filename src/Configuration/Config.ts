@@ -19,6 +19,7 @@ export const endpoints = {
     logout: '/auth/logout',
     refresh: '/auth/refresh',
     userInfo: '/auth/userinfo',
+    oauthLogin: 'auth/oauth2/login',
   },
   product: {
     getAll: '/menu-items/get-all',
